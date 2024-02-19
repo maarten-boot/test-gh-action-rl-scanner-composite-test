@@ -1,5 +1,5 @@
 name: 'test-gh-action-rl-scanner-composite-test'
-author: ''
+author: 'maarten-boot'
 description: 'Scan an artifact with ReversingLabs secure.software CLI'
 
 branding:
