@@ -103,7 +103,7 @@ runs:
     # Note: It is currently not possible to get the URL for the uploaded asset
     - name: Upload the rl-scanner report
       if: success() || failure()
-      uses: actions/upload-artifact@v4.3.1
+      uses: actions/upload-artifact@v4
       with:
         name: "report-${{ inputs.ref-sha }}"
         path: "${{ inputs.report-path }}"
@@ -121,7 +121,7 @@ runs:
     # Update the status from pending to failure/success and set the descriptive text
     - name: Set the analysis status
       if: success() || failure()
-      uses: ouzi-dev/commit-status-updater@v2.0.1
+      uses: ouzi-dev/commit-status-updater@v2
       with:
         addHoldComment: "true"
         description: ${{ steps.scan.outputs.description }}
