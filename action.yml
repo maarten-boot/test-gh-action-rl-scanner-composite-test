@@ -1,0 +1,146 @@
+name: 'test-gh-action-rl-scanner-composite-test'
+author: ''
+description: 'Scan an artifact with ReversingLabs secure.software CLI'
+
+branding:
+  icon: 'shield'
+  color: 'purple'
+
+inputs:
+  artifact-to-scan:
+    description: 'Path to the package file (artifact) you want to scan'
+    required: true
+  report-path:
+    description: 'Path to a directory where the reports will be saved (must be a new directory, with a path relative to the github.workspace)'
+    required: false
+    default: MyReportDir
+
+  rl-store:
+    description: 'Path to a directory where a rl-store has been initialized'
+    required: false
+    default: ""
+    type: string
+  rl-diff-with:
+    description: 'Perform a diff scan against the provided version'
+    required: false
+    default: ""
+    type: string
+  rl-package-url:
+    description: 'A package url to use for this scan'
+    required: false
+    default: ""
+    type: string
+  rl-verbose:
+    description: 'Make the scanner more verbose'
+    required: false
+    default: false
+    type: bool
+
+  rl-proxy-server:
+    description: 'An optional proxy server to use'
+    required: false
+    default: ""
+    type: string
+  rl-proxy-port:
+    description: 'An optional proxy server port to use'
+    required: false
+    default: ""
+    type: string
+  rl-proxy-user:
+    description: 'An optional proxy server user to use'
+    required: false
+    default: ""
+    type: string
+  rl-proxy-password:
+    description: 'An optional proxy server password to use'
+    required: false
+    default: ""
+    type: string
+
+  ref-sha:
+    description: 'Reference SHA of the commit or pull request'
+    required: false
+    default: ${{ github.event.pull_request.head.sha || github.sha }}
+
+outputs:
+  description:
+    description: 'The result of the action: a string terminating in FAIL or PASS'
+    value: ${{ steps.scan.outputs.description }}
+  status:
+    description: 'The single word result of the action: success, failure or error'
+    value: ${{ steps.scan.outputs.status }}
+
+runs:
+  using: "composite"
+
+  steps:
+    # -------------------------------------------
+    # Set the analysis status to pending
+    - name: Set the pending status
+      uses: ouzi-dev/commit-status-updater@v2.0.1
+      with:
+        addHoldComment: "true"
+
+    # -------------------------------------------
+    # Run the reversinglabs/rl-scanner using the scan only action
+    - name: ReversingLabs apply rl-scanner to the build artifact
+      id: scan
+      uses: reversinglabs/gh-action-rl-scanner-only@v1
+      with:
+        artifact-to-scan: ${{ inputs.artifact-to-scan }}
+        report-path: ${{ inputs.report-path }}
+        rl-verbose: ${{ inputs.rl-verbose }}
+        rl-store: ${{ inputs.rl-store }}
+        rl-package-url: ${{ inputs.rl-package-url }}
+        rl-diff-with: ${{ inputs.rl-diff-with }}
+        rl-proxy-server: ${{ inputs.rl-proxy-server }}
+        rl-proxy-port: ${{ inputs.rl-proxy-port }}
+        rl-proxy-user: ${{ inputs.rl-proxy-user }}
+        rl-proxy-password: ${{ inputs.rl-proxy-password }}
+
+    # -------------------------------------
+    # Upload the secure.software report to GitHub
+    # Note: It is currently not possible to get the URL for the uploaded asset
+    - name: Upload the rl-scanner report
+      if: success() || failure()
+      uses: actions/upload-artifact@actions/upload-artifact@v4.3.1
+      with:
+        name: "report-${{ inputs.ref-sha }}"
+        path: "${{ inputs.report-path }}"
+
+    # -------------------------------------
+    # Upload the secure.software SARIF report to GitHub
+    - name: Upload the SARIF report
+      if: success() || failure()
+      uses: github/codeql-action/upload-sarif@v2.16.2
+      with:
+        sarif_file: "${{ inputs.report-path }}/report.sarif.json"
+        category: rl-secure-scanner
+
+    # -------------------------------------
+    # Update the status from pending to failure/success and set the descriptive text
+    - name: Set the analysis status
+      if: success() || failure()
+      uses: ouzi-dev/commit-status-updater@v2.0.1
+      with:
+        addHoldComment: "true"
+        description: ${{ steps.scan.outputs.description }}
+        status: ${{ steps.scan.outputs.status }}
+
+    # -------------------------------------
+    # Return the proper exit status
+    - name: Set the exit status
+      if: always()
+      shell: bash
+      run: |
+        case "${{ steps.scan.outputs.status }}" in
+        success)
+          exit 0
+          ;;
+        failure)
+          exit 1
+          ;;
+        *)
+          exit 101
+          ;;
+        esac
