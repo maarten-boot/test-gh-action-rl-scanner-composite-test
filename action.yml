@@ -112,7 +112,7 @@ runs:
     # Upload the secure.software SARIF report to GitHub
     - name: Upload the SARIF report
       if: success() || failure()
-      uses: github/codeql-action/upload-sarif@v2.16.2
+      uses: github/codeql-action/upload-sarif@v2
       with:
         sarif_file: "${{ inputs.report-path }}/report.sarif.json"
         category: rl-secure-scanner
