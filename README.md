@@ -217,7 +217,7 @@ jobs:
           RLSECURE_ENCODED_LICENSE: ${{ secrets.RLSECURE_ENCODED_LICENSE }}
           RLSECURE_SITE_KEY: ${{ secrets.RLSECURE_SITE_KEY }}
 
-        uses: reversinglabs/gh-action-rl-scanner-composite@v1.0.2
+        uses: reversinglabs/gh-action-rl-scanner-composite@v1
 
         with:
           artifact-to-scan: ${{ steps.build.outputs.scanfile }}

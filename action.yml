@@ -77,7 +77,7 @@ runs:
     # -------------------------------------------
     # Set the analysis status to pending
     - name: Set the pending status
-      uses: ouzi-dev/commit-status-updater@v2.0.1
+      uses: ouzi-dev/commit-status-updater@v2
       with:
         addHoldComment: "true"
 
@@ -103,7 +103,7 @@ runs:
     # Note: It is currently not possible to get the URL for the uploaded asset
     - name: Upload the rl-scanner report
       if: success() || failure()
-      uses: actions/upload-artifact@actions/upload-artifact@v4.3.1
+      uses: actions/upload-artifact@v4
       with:
         name: "report-${{ inputs.ref-sha }}"
         path: "${{ inputs.report-path }}"
@@ -112,7 +112,7 @@ runs:
     # Upload the secure.software SARIF report to GitHub
     - name: Upload the SARIF report
       if: success() || failure()
-      uses: github/codeql-action/upload-sarif@v2.16.2
+      uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: "${{ inputs.report-path }}/report.sarif.json"
         category: rl-secure-scanner
@@ -121,7 +121,7 @@ runs:
     # Update the status from pending to failure/success and set the descriptive text
     - name: Set the analysis status
       if: success() || failure()
-      uses: ouzi-dev/commit-status-updater@v2.0.1
+      uses: ouzi-dev/commit-status-updater@v2
       with:
         addHoldComment: "true"
         description: ${{ steps.scan.outputs.description }}
