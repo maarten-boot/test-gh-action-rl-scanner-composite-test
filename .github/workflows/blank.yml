@@ -30,7 +30,7 @@ jobs:
         env:
           RLSECURE_ENCODED_LICENSE: ${{ secrets.RLSECURE_ENCODED_LICENSE }}
           RLSECURE_SITE_KEY: ${{ secrets.RLSECURE_SITE_KEY }}
-        uses: reversinglabs/gh-action-rl-scanner-composite@v1
+        uses: reversinglabs/gh-action-rl-scanner-composite@v1.0.3
         with:
           artifact-to-scan: README.md
           report-path: "My_Report_Dir"
