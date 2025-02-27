@@ -232,3 +232,4 @@ jobs:
 - The [rl-scanner-only](https://github.com/reversinglabs/gh-action-rl-scanner-only) GitHub Action
 - Introduction to [secure software release processes](https://www.reversinglabs.com/solutions/secure-software-release-processes) with ReversingLabs
 - [Software supply chain security for application security teams](https://3375217.fs1.hubspotusercontent-na1.net/hubfs/3375217/Documents/Business-Brief-Software-Supply-Chain-Security-for-Application-Security-Teams.pdf) (link to a PDF document)
+
